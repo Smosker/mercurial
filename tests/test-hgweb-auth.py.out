@@ -1,0 +1,196 @@
+
+*** Test in-uri schemes
+
+CFG: {b'x.prefix': b'http://example.org'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('x', 'x')
+URI: http://example.org/bar
+     ('x', 'x')
+URI: https://example.org/foo
+     abort
+URI: https://example.org/foo/bar
+     abort
+URI: https://example.org/bar
+     abort
+URI: https://x@example.org/bar
+     abort
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'https://example.org'}
+URI: http://example.org/foo
+     abort
+URI: http://example.org/foo/bar
+     abort
+URI: http://example.org/bar
+     abort
+URI: https://example.org/foo
+     ('x', 'x')
+URI: https://example.org/foo/bar
+     ('x', 'x')
+URI: https://example.org/bar
+     ('x', 'x')
+URI: https://x@example.org/bar
+     ('x', 'x')
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'http://example.org', b'x.schemes': b'https'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('x', 'x')
+URI: http://example.org/bar
+     ('x', 'x')
+URI: https://example.org/foo
+     abort
+URI: https://example.org/foo/bar
+     abort
+URI: https://example.org/bar
+     abort
+URI: https://x@example.org/bar
+     abort
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'https://example.org', b'x.schemes': b'http'}
+URI: http://example.org/foo
+     abort
+URI: http://example.org/foo/bar
+     abort
+URI: http://example.org/bar
+     abort
+URI: https://example.org/foo
+     ('x', 'x')
+URI: https://example.org/foo/bar
+     ('x', 'x')
+URI: https://example.org/bar
+     ('x', 'x')
+URI: https://x@example.org/bar
+     ('x', 'x')
+URI: https://y@example.org/bar
+     abort
+
+*** Test separately configured schemes
+
+CFG: {b'x.prefix': b'example.org', b'x.schemes': b'http'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('x', 'x')
+URI: http://example.org/bar
+     ('x', 'x')
+URI: https://example.org/foo
+     abort
+URI: https://example.org/foo/bar
+     abort
+URI: https://example.org/bar
+     abort
+URI: https://x@example.org/bar
+     abort
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'example.org', b'x.schemes': b'https'}
+URI: http://example.org/foo
+     abort
+URI: http://example.org/foo/bar
+     abort
+URI: http://example.org/bar
+     abort
+URI: https://example.org/foo
+     ('x', 'x')
+URI: https://example.org/foo/bar
+     ('x', 'x')
+URI: https://example.org/bar
+     ('x', 'x')
+URI: https://x@example.org/bar
+     ('x', 'x')
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'example.org', b'x.schemes': b'http https'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('x', 'x')
+URI: http://example.org/bar
+     ('x', 'x')
+URI: https://example.org/foo
+     ('x', 'x')
+URI: https://example.org/foo/bar
+     ('x', 'x')
+URI: https://example.org/bar
+     ('x', 'x')
+URI: https://x@example.org/bar
+     ('x', 'x')
+URI: https://y@example.org/bar
+     abort
+
+*** Test prefix matching
+
+CFG: {b'x.prefix': b'http://example.org/foo', b'y.prefix': b'http://example.org/bar'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('x', 'x')
+URI: http://example.org/bar
+     ('y', 'y')
+URI: https://example.org/foo
+     abort
+URI: https://example.org/foo/bar
+     abort
+URI: https://example.org/bar
+     abort
+URI: https://x@example.org/bar
+     abort
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'http://example.org/foo', b'y.prefix': b'http://example.org/foo/bar'}
+URI: http://example.org/foo
+     ('x', 'x')
+URI: http://example.org/foo/bar
+     ('y', 'y')
+URI: http://example.org/bar
+     abort
+URI: https://example.org/foo
+     abort
+URI: https://example.org/foo/bar
+     abort
+URI: https://example.org/bar
+     abort
+URI: https://x@example.org/bar
+     abort
+URI: https://y@example.org/bar
+     abort
+CFG: {b'x.prefix': b'*', b'y.prefix': b'https://example.org/bar'}
+URI: http://example.org/foo
+     abort
+URI: http://example.org/foo/bar
+     abort
+URI: http://example.org/bar
+     abort
+URI: https://example.org/foo
+     ('x', 'x')
+URI: https://example.org/foo/bar
+     ('x', 'x')
+URI: https://example.org/bar
+     ('y', 'y')
+URI: https://x@example.org/bar
+     ('x', 'x')
+URI: https://y@example.org/bar
+     ('y', 'y')
+
+*** Test user matching
+
+CFG: {b'x.password': b'xpassword', b'x.prefix': b'http://example.org/foo', b'x.username': None}
+URI: http://y@example.org/foo
+     ('y', 'xpassword')
+CFG: {b'x.password': b'xpassword', b'x.prefix': b'http://example.org/foo', b'x.username': None, b'y.password': b'ypassword', b'y.prefix': b'http://example.org/foo', b'y.username': b'y'}
+URI: http://y@example.org/foo
+     ('y', 'ypassword')
+CFG: {b'x.password': b'xpassword', b'x.prefix': b'http://example.org/foo/bar', b'x.username': None, b'y.password': b'ypassword', b'y.prefix': b'http://example.org/foo', b'y.username': b'y'}
+URI: http://y@example.org/foo/bar
+     ('y', 'xpassword')
+
+*** Test urllib2 and util.url
+
+URIs: http://user@example.com:8080/foo http://example.com:8080/foo
+('user', '')
