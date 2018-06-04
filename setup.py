@@ -956,7 +956,7 @@ datafiles = []
 # unicode on Python 2 still works because it won't contain any
 # non-ascii bytes and will be implicitly converted back to bytes
 # when operated on.
-setupversion = version.decode('ascii')
+setupversion = version
 
 extra = {}
 
